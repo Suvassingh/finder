@@ -10,8 +10,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # ─── Security ─────────────────────────────────────────────────────────────────
 SECRET_KEY = os.environ["SECRET_KEY"]   # Hard fail if missing — never use a default in prod
 DEBUG = os.getenv("DEBUG", "False") == "True"
-ALLOWED_HOSTS = [h.strip() for h in os.getenv("ALLOWED_HOSTS", "127.0.0.1,localhost").split(",")]
-
+ALLOWED_HOSTS = [h.strip() for h in os.getenv("ALLOWED_HOSTS", "127.0.0.1,localhost,khoji-com.onrender.com").split(",")]
 # ─── CSRF Trusted Origins (required for mobile API on Render) ─────────────────
 CSRF_TRUSTED_ORIGINS = [
     'https://khoji-com.onrender.com',

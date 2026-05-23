@@ -12,6 +12,11 @@ SECRET_KEY = os.environ["SECRET_KEY"]   # Hard fail if missing — never use a d
 DEBUG = os.getenv("DEBUG", "False") == "True"
 ALLOWED_HOSTS = [h.strip() for h in os.getenv("ALLOWED_HOSTS", "127.0.0.1,localhost").split(",")]
 
+# ─── CSRF Trusted Origins (required for mobile API on Render) ─────────────────
+CSRF_TRUSTED_ORIGINS = [
+    'https://khoji-com.onrender.com',
+]
+
 # ─── Apps ─────────────────────────────────────────────────────────────────────
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -34,7 +39,7 @@ INSTALLED_APPS = [
 
 # ─── Middleware ───────────────────────────────────────────────────────────────
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',       # Must be first
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -46,13 +51,20 @@ MIDDLEWARE = [
 ]
 
 # ─── CORS ─────────────────────────────────────────────────────────────────────
-CORS_ALLOW_ALL_ORIGINS = DEBUG   # False in production
+CORS_ALLOW_ALL_ORIGINS = DEBUG   # True in dev, False in production
 CORS_ALLOWED_ORIGINS = [
-    o.strip() for o in os.getenv("CORS_ALLOWED_ORIGINS", "http://localhost:3000").split(",")
+    o.strip() for o in os.getenv(
+        "CORS_ALLOWED_ORIGINS",
+        "http://localhost:3000,http://10.0.2.2:8000"
+    ).split(",")
 ]
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_HEADERS = [
-    'authorization', 'content-type', 'accept', 'origin', 'x-requested-with',
+    'authorization',
+    'content-type',
+    'accept',
+    'origin',
+    'x-requested-with',
 ]
 
 # ─── URLs / Templates ─────────────────────────────────────────────────────────
@@ -111,8 +123,8 @@ REST_FRAMEWORK = {
     'DEFAULT_THROTTLE_RATES': {
         'anon': '100/day',
         'user': '1000/day',
-        'login': '10/minute',      # custom scope used in login view
-        'signup': '10/hour',       # custom scope used in signup view
+        'login': '10/minute',
+        'signup': '10/hour',
     },
 }
 
@@ -176,7 +188,7 @@ GOOGLE_OAUTH2_CLIENT_ID = os.getenv('GOOGLE_OAUTH2_CLIENT_ID', '')
 # ─── Frontend URL (for password reset links) ─────────────────────────────────
 FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://127.0.0.1:8000')
 
-# ─── Logging ─────────────────────────────────────────────────────────────────
+# ─── Logging (console only — Render has no persistent filesystem) ─────────────
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -191,7 +203,6 @@ LOGGING = {
             'class': 'logging.StreamHandler',
             'formatter': 'verbose',
         },
-        # ← file handler removed (Render has no persistent filesystem)
     },
     'root': {
         'handlers': ['console'],
@@ -205,40 +216,9 @@ LOGGING = {
         },
     },
 }
-# LOGGING = {
-#     'version': 1,
-#     'disable_existing_loggers': False,
-#     'formatters': {
-#         'verbose': {
-#             'format': '[{asctime}] {levelname} {name} {message}',
-#             'style': '{',
-#         },
-#     },
-#     'handlers': {
-#         'console': {
-#             'class': 'logging.StreamHandler',
-#             'formatter': 'verbose',
-#         },
-#         'file': {
-#             'class': 'logging.FileHandler',
-#             'filename': BASE_DIR / 'logs' / 'django.log',
-#             'formatter': 'verbose',
-#         },
-#     },
-#     'root': {
-#         'handlers': ['console'],
-#         'level': 'INFO',
-#     },
-#     'loggers': {
-#         'django': {
-#             'handlers': ['console'],
-#             'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
-#             'propagate': False,
-#         },
-#     },
-# }
 
-# ─── Security headers (enable in production) ─────────────────────────────────
+# ─── Security headers (production only) ──────────────────────────────────────
+# NOTE: SECURE_SSL_REDIRECT is intentionally excluded — Render handles HTTPS
 if not DEBUG:
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True

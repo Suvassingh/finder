@@ -8,10 +8,21 @@ load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # ─── Security ─────────────────────────────────────────────────────────────────
-SECRET_KEY = os.environ["SECRET_KEY"]   # Hard fail if missing — never use a default in prod
+SECRET_KEY = os.environ["SECRET_KEY"]
 DEBUG = os.getenv("DEBUG", "False") == "True"
-ALLOWED_HOSTS = [h.strip() for h in os.getenv("ALLOWED_HOSTS", "127.0.0.1,localhost,khoji-com.onrender.com").split(",")]
-# ─── CSRF Trusted Origins (required for mobile API on Render) ─────────────────
+
+# Hardcoded to always include Render domain regardless of env vars
+ALLOWED_HOSTS = [
+    'khoji-com.onrender.com',
+    '127.0.0.1',
+    'localhost',
+]
+# Add any extra hosts from env var on top
+_extra_hosts = os.getenv("ALLOWED_HOSTS", "")
+if _extra_hosts:
+    ALLOWED_HOSTS += [h.strip() for h in _extra_hosts.split(",") if h.strip()]
+
+# ─── CSRF ─────────────────────────────────────────────────────────────────────
 CSRF_TRUSTED_ORIGINS = [
     'https://khoji-com.onrender.com',
 ]
@@ -27,7 +38,7 @@ INSTALLED_APPS = [
 
     # Third-party
     'rest_framework',
-    'rest_framework_simplejwt.token_blacklist',   # Required for token rotation
+    'rest_framework_simplejwt.token_blacklist',
     'corsheaders',
 
     # Local
@@ -43,19 +54,14 @@ MIDDLEWARE = [
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
+    # CsrfViewMiddleware removed — JWT auth doesn't need CSRF
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
 # ─── CORS ─────────────────────────────────────────────────────────────────────
-CORS_ALLOW_ALL_ORIGINS = DEBUG   # True in dev, False in production
-CORS_ALLOWED_ORIGINS = [
-    o.strip() for o in os.getenv(
-        "CORS_ALLOWED_ORIGINS",
-        "http://localhost:3000,http://10.0.2.2:8000"
-    ).split(",")
-]
+CORS_ALLOW_ALL_ORIGINS = True   # Allow all origins for mobile app
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_HEADERS = [
     'authorization',
@@ -99,7 +105,7 @@ DATABASES = {
             'charset': 'utf8mb4',
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
         },
-        'CONN_MAX_AGE': 60,   # Persistent connections
+        'CONN_MAX_AGE': 60,
     }
 }
 
@@ -169,10 +175,7 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024   # 10 MB
 FILE_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024   # 10 MB
 
 # ─── Email ────────────────────────────────────────────────────────────────────
-EMAIL_BACKEND = os.getenv(
-    'EMAIL_BACKEND',
-    'django.core.mail.backends.smtp.EmailBackend'
-)
+EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
 EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.gmail.com')
 EMAIL_PORT = int(os.getenv('EMAIL_PORT', 587))
 EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True') == 'True'
@@ -183,7 +186,7 @@ DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', EMAIL_HOST_USER or 'noreply
 # ─── Google OAuth2 ────────────────────────────────────────────────────────────
 GOOGLE_OAUTH2_CLIENT_ID = os.getenv('GOOGLE_OAUTH2_CLIENT_ID', '')
 
-# ─── Frontend URL (for password reset links) ─────────────────────────────────
+# ─── Frontend URL ─────────────────────────────────────────────────────────────
 FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://127.0.0.1:8000')
 
 # ─── Logging (console only — Render has no persistent filesystem) ─────────────
@@ -216,7 +219,7 @@ LOGGING = {
 }
 
 # ─── Security headers (production only) ──────────────────────────────────────
-# NOTE: SECURE_SSL_REDIRECT is intentionally excluded — Render handles HTTPS
+# NOTE: SECURE_SSL_REDIRECT excluded — Render handles HTTPS termination
 if not DEBUG:
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True

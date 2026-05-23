@@ -17,7 +17,6 @@ ALLOWED_HOSTS = [
     '127.0.0.1',
     'localhost',
 ]
-# Add any extra hosts from env var on top
 _extra_hosts = os.getenv("ALLOWED_HOSTS", "")
 if _extra_hosts:
     ALLOWED_HOSTS += [h.strip() for h in _extra_hosts.split(",") if h.strip()]
@@ -34,7 +33,9 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'cloudinary_storage',              # ← before staticfiles
     'django.contrib.staticfiles',
+    'cloudinary',                      # ← after staticfiles
 
     # Third-party
     'rest_framework',
@@ -109,6 +110,14 @@ DATABASES = {
     }
 }
 
+# ─── Cloudinary (persistent media storage — required on Render free tier) ─────
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME'),
+    'API_KEY':    os.getenv('CLOUDINARY_API_KEY'),
+    'API_SECRET': os.getenv('CLOUDINARY_API_SECRET'),
+}
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
 # ─── DRF ─────────────────────────────────────────────────────────────────────
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -165,6 +174,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
+# Media handled by Cloudinary — MEDIA_URL/ROOT kept for local dev only
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 

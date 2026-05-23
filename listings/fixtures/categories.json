@@ -1,0 +1,57 @@
+[
+  {
+    "model": "listings.category",
+    "pk": 1,
+    "fields": {
+      "name": "Rooms",
+      "slug": "rooms",
+      "category_type": "room",
+      "is_active": true,
+      "order": 1
+    }
+  },
+  {
+    "model": "listings.category",
+    "pk": 2,
+    "fields": {
+      "name": "Hotels",
+      "slug": "hotels",
+      "category_type": "hotel",
+      "is_active": true,
+      "order": 2
+    }
+  },
+  {
+    "model": "listings.category",
+    "pk": 3,
+    "fields": {
+      "name": "Salons",
+      "slug": "salons",
+      "category_type": "salon",
+      "is_active": true,
+      "order": 3
+    }
+  },
+  {
+    "model": "listings.category",
+    "pk": 4,
+    "fields": {
+      "name": "Buses",
+      "slug": "buses",
+      "category_type": "bus",
+      "is_active": true,
+      "order": 4
+    }
+  },
+  {
+    "model": "listings.category",
+    "pk": 5,
+    "fields": {
+      "name": "Restaurants",
+      "slug": "restaurants",
+      "category_type": "restaurant",
+      "is_active": true,
+      "order": 5
+    }
+  }
+]

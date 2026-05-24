@@ -11,7 +11,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ["SECRET_KEY"]
 DEBUG = os.getenv("DEBUG", "False") == "True"
 
-# Hardcoded to always include Render domain regardless of env vars
 ALLOWED_HOSTS = [
     'khoji-com.onrender.com',
     '127.0.0.1',
@@ -28,15 +27,15 @@ CSRF_TRUSTED_ORIGINS = [
 
 # ─── Apps ─────────────────────────────────────────────────────────────────────
 INSTALLED_APPS = [
-    'jazzmin',                         
+    'jazzmin',                          # ← must be first
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'cloudinary_storage',              
+    'cloudinary_storage',
     'django.contrib.staticfiles',
-    'cloudinary',                      
+    'cloudinary',
 
     # Third-party
     'rest_framework',
@@ -51,19 +50,18 @@ INSTALLED_APPS = [
 
 # ─── Middleware ───────────────────────────────────────────────────────────────
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',       # Must be first
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',   # ← serves static files
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    # CsrfViewMiddleware removed — JWT auth doesn't need CSRF
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
 # ─── CORS ─────────────────────────────────────────────────────────────────────
-CORS_ALLOW_ALL_ORIGINS = True   # Allow all origins for mobile app
+CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_HEADERS = [
     'authorization',
@@ -111,7 +109,7 @@ DATABASES = {
     }
 }
 
-# ─── Cloudinary (persistent media storage — required on Render free tier) ─────
+# ─── Cloudinary ───────────────────────────────────────────────────────────────
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME'),
     'API_KEY':    os.getenv('CLOUDINARY_API_KEY'),
@@ -119,6 +117,15 @@ CLOUDINARY_STORAGE = {
 }
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
+import cloudinary
+cloudinary.config(
+    cloud_name = os.getenv('CLOUDINARY_CLOUD_NAME'),
+    api_key    = os.getenv('CLOUDINARY_API_KEY'),
+    api_secret = os.getenv('CLOUDINARY_API_SECRET'),
+    secure     = True
+)
+
+# ─── Jazzmin ──────────────────────────────────────────────────────────────────
 JAZZMIN_SETTINGS = {
     "site_title": "Khoji Admin",
     "site_header": "Khoji",
@@ -174,6 +181,7 @@ SIMPLE_JWT = {
     'UPDATE_LAST_LOGIN': True,
 }
 
+# ─── Password Validation ─────────────────────────────────────────────────────
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
@@ -182,20 +190,28 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
+# ─── Internationalisation ─────────────────────────────────────────────────────
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'Asia/Kathmandu'
 USE_I18N = True
 USE_TZ = True
 
+# ─── Static files ─────────────────────────────────────────────────────────────
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+# Plain storage — no compression/manifest (avoids Jazzmin .map file errors)
 STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
+# Tell WhiteNoise where to find collected static files
+WHITENOISE_ROOT = BASE_DIR / 'staticfiles'
+WHITENOISE_AUTOREFRESH = True
 
+# ─── Media files (served by Cloudinary in production) ────────────────────────
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# ─── File upload limits ───────────────────────────────────────────────────────
 DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024   # 10 MB
 FILE_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024   # 10 MB
 
@@ -214,7 +230,7 @@ GOOGLE_OAUTH2_CLIENT_ID = os.getenv('GOOGLE_OAUTH2_CLIENT_ID', '')
 # ─── Frontend URL ─────────────────────────────────────────────────────────────
 FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://127.0.0.1:8000')
 
-# ─── Logging (console only — Render has no persistent filesystem) ─────────────
+# ─── Logging ─────────────────────────────────────────────────────────────────
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -244,7 +260,7 @@ LOGGING = {
 }
 
 # ─── Security headers (production only) ──────────────────────────────────────
-# NOTE: SECURE_SSL_REDIRECT excluded — Render handles HTTPS termination
+# SECURE_SSL_REDIRECT excluded — Render handles HTTPS termination
 if not DEBUG:
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True

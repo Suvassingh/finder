@@ -27,6 +27,7 @@ CSRF_TRUSTED_ORIGINS = [
 
 # ─── Apps ─────────────────────────────────────────────────────────────────────
 INSTALLED_APPS = [
+    'simpleui',                         # ← replaces jazzmin, loads from CDN
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -49,11 +50,9 @@ INSTALLED_APPS = [
 
 # ─── Middleware ───────────────────────────────────────────────────────────────
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
-
-    'corsheaders.middleware.CorsMiddleware',
-
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -126,24 +125,11 @@ cloudinary.config(
     secure     = True
 )
 
-# ─── Jazzmin ──────────────────────────────────────────────────────────────────
-# JAZZMIN_SETTINGS = {
-#     "site_title": "Khoji Admin",
-#     "site_header": "Khoji",
-#     "site_brand": "Khoji",
-#     "welcome_sign": "Welcome to Khoji Admin",
-#     "site_icon": None,
-#     "show_sidebar": True,
-#     "navigation_expanded": True,
-#     "icons": {
-#         "listings.category": "fas fa-th-large",
-#         "listings.listing": "fas fa-map-marker-alt",
-#         "reviews.review": "fas fa-star",
-#         "accounts.user": "fas fa-users",
-#     },
-#     "default_icon_parents": "fas fa-chevron-circle-right",
-#     "default_icon_children": "fas fa-circle",
-# }
+# ─── SimpleUI config ──────────────────────────────────────────────────────────
+SIMPLEUI_HOME_INFO = False       # hide SimpleUI info box on dashboard
+SIMPLEUI_ANALYSIS = False        # disable usage analytics
+SIMPLEUI_DEFAULT_THEME = 'admin.lte.css'  # clean light theme
+SIMPLEUI_LOGO = None
 
 # ─── DRF ─────────────────────────────────────────────────────────────────────
 REST_FRAMEWORK = {
@@ -197,18 +183,15 @@ TIME_ZONE = 'Asia/Kathmandu'
 USE_I18N = True
 USE_TZ = True
 
-# ─── Static files (corrected for WhiteNoise) ─────────────────────────────────
-# Static files
+# ─── Static files ─────────────────────────────────────────────────────────────
 STATIC_URL = '/static/'
-
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+# Plain storage — no compression (avoids map file errors)
+STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
+WHITENOISE_ROOT = BASE_DIR / 'staticfiles'
+WHITENOISE_AUTOREFRESH = True
 
-STATICFILES_DIRS = [
-    BASE_DIR / "static",
-]
-
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
-# ─── Media files (served by Cloudinary in production) ────────────────────────
+# ─── Media files (Cloudinary in production) ───────────────────────────────────
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
@@ -271,4 +254,4 @@ if not DEBUG:
     SECURE_HSTS_SECONDS = 31536000
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = False

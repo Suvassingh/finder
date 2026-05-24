@@ -177,7 +177,7 @@ USE_TZ = True
 
 # ─── Static & Media files ─────────────────────────────────────────────────────
 STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
@@ -187,10 +187,10 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # - default: uploaded media goes to Cloudinary
 STORAGES = {
     "default": {
-        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
     },
     "staticfiles": {
-        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",  
     },
 }
 STATICFILES_STORAGE = STORAGES["staticfiles"]["BACKEND"]

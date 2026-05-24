@@ -40,7 +40,7 @@ def _token_response(user):
     }
 
 
-# ─── Signup ──────────────────────────────────────────────────────────────────
+#  Signup 
 
 class SignupThrottle(ScopedRateThrottle):
     scope = 'signup'
@@ -84,7 +84,7 @@ def signup_api(request):
     }, status=201)
 
 
-# ─── Login ───────────────────────────────────────────────────────────────────
+#  Login 
 
 class LoginThrottle(ScopedRateThrottle):
     scope = 'login'

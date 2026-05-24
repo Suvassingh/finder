@@ -194,7 +194,6 @@ STORAGES = {
     },
 }
 WHITENOISE_MANIFEST_STRICT = False
-STATICFILES_STORAGE = STORAGES["staticfiles"]["BACKEND"]
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 

@@ -51,7 +51,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',   # ← serves staticfiles/
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -114,7 +114,6 @@ CLOUDINARY_STORAGE = {
     'API_KEY':    os.getenv('CLOUDINARY_API_KEY'),
     'API_SECRET': os.getenv('CLOUDINARY_API_SECRET'),
 }
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 import cloudinary
 cloudinary.config(
@@ -123,11 +122,6 @@ cloudinary.config(
     api_secret = os.getenv('CLOUDINARY_API_SECRET'),
     secure     = True
 )
-
-# ─── SimpleUI ────────────────────────────────────────────────────────────────
-SIMPLEUI_HOME_INFO = False
-SIMPLEUI_ANALYSIS = False
-SIMPLEUI_DEFAULT_THEME = 'admin.lte.css'
 
 # ─── DRF ─────────────────────────────────────────────────────────────────────
 REST_FRAMEWORK = {
@@ -181,18 +175,30 @@ TIME_ZONE = 'Asia/Kathmandu'
 USE_I18N = True
 USE_TZ = True
 
-# ─── Static files ─────────────────────────────────────────────────────────────
+# ─── Static & Media files ─────────────────────────────────────────────────────
 STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'      
-# ─── Media files (Cloudinary handles this in production) ──────────────────────
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+# Django 5.x unified STORAGES setting
+# - staticfiles: served by WhiteNoise from staticfiles/
+# - default: uploaded media goes to Cloudinary
+STORAGES = {
+    "default": {
+        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+}
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # ─── File upload limits ───────────────────────────────────────────────────────
-DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024
-FILE_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024
+DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024   # 10 MB
+FILE_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024   # 10 MB
 
 # ─── Email ────────────────────────────────────────────────────────────────────
 EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')

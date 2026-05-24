@@ -190,7 +190,7 @@ STORAGES = {
         "BACKEND": "django.core.files.storage.FileSystemStorage",
     },
     "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",  
+        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
     },
 }
 STATICFILES_STORAGE = STORAGES["staticfiles"]["BACKEND"]
@@ -255,3 +255,4 @@ if not DEBUG:
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = False
+    WHITENOISE_MANIFEST_STRICT = False

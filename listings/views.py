@@ -392,7 +392,8 @@ def upload_images(request):
         safe_name = "".join(c if c.isalnum() or c in ('_', '.', '-') else '_' for c in f.name)
         filename = f"listing_images/{timestamp}_{safe_name}"
         saved_path = default_storage.save(filename, f)
-        url = request.build_absolute_uri(f"{settings.MEDIA_URL}{saved_path}")
+        # url = request.build_absolute_uri(f"{settings.MEDIA_URL}{saved_path}")
+        url = request.build_absolute_uri(default_storage.url(saved_path))
 
         UploadedImage.objects.create(
             uploaded_by=request.user,

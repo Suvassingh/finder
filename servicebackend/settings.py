@@ -183,9 +183,7 @@ USE_TZ = True
 
 # ─── Static files ─────────────────────────────────────────────────────────────
 STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'      # ← NOT commented out, required!
-STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
-
+STATIC_ROOT = BASE_DIR / 'staticfiles'      
 # ─── Media files (Cloudinary handles this in production) ──────────────────────
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'

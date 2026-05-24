@@ -199,11 +199,9 @@ USE_TZ = True
 # ─── Static files ─────────────────────────────────────────────────────────────
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-# Plain storage — no compression/manifest (avoids Jazzmin .map file errors)
+
 STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
-# Tell WhiteNoise where to find collected static files
-WHITENOISE_ROOT = BASE_DIR / 'staticfiles'
-WHITENOISE_AUTOREFRESH = True
+
 
 # ─── Media files (served by Cloudinary in production) ────────────────────────
 MEDIA_URL = '/media/'

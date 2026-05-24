@@ -27,7 +27,7 @@ CSRF_TRUSTED_ORIGINS = [
 
 # ─── Apps ─────────────────────────────────────────────────────────────────────
 INSTALLED_APPS = [
-    'simpleui',                         # ← replaces jazzmin, loads from CDN
+    'simpleui',                         # ← must be first
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -52,7 +52,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',   # ← serves staticfiles/
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -125,11 +125,10 @@ cloudinary.config(
     secure     = True
 )
 
-# ─── SimpleUI config ──────────────────────────────────────────────────────────
-SIMPLEUI_HOME_INFO = False       # hide SimpleUI info box on dashboard
-SIMPLEUI_ANALYSIS = False        # disable usage analytics
-SIMPLEUI_DEFAULT_THEME = 'admin.lte.css'  # clean light theme
-SIMPLEUI_LOGO = None
+# ─── SimpleUI ────────────────────────────────────────────────────────────────
+SIMPLEUI_HOME_INFO = False
+SIMPLEUI_ANALYSIS = False
+SIMPLEUI_DEFAULT_THEME = 'admin.lte.css'
 
 # ─── DRF ─────────────────────────────────────────────────────────────────────
 REST_FRAMEWORK = {
@@ -185,21 +184,18 @@ USE_TZ = True
 
 # ─── Static files ─────────────────────────────────────────────────────────────
 STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
-# Plain storage — no compression (avoids map file errors)
+STATIC_ROOT = BASE_DIR / 'staticfiles'      # ← NOT commented out, required!
 STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
-WHITENOISE_ROOT = BASE_DIR / 'staticfiles'
-WHITENOISE_AUTOREFRESH = True
 
-# ─── Media files (Cloudinary in production) ───────────────────────────────────
+# ─── Media files (Cloudinary handles this in production) ──────────────────────
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # ─── File upload limits ───────────────────────────────────────────────────────
-DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024   # 10 MB
-FILE_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024   # 10 MB
+DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024
+FILE_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024
 
 # ─── Email ────────────────────────────────────────────────────────────────────
 EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')

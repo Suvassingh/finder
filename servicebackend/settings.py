@@ -27,7 +27,6 @@ CSRF_TRUSTED_ORIGINS = [
 
 # ─── Apps ─────────────────────────────────────────────────────────────────────
 INSTALLED_APPS = [
-    'simpleui',                         # ← must be first
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

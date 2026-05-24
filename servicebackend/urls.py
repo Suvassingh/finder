@@ -20,7 +20,7 @@ urlpatterns = [
     # Auth
     path('api/accounts/', include('accounts.api_urls')),
 
-    # Listings (rooms, hotels, salons, buses, restaurants, …)
+
     path('api/listings/', include('listings.urls')),
 
     # Reviews

@@ -196,12 +196,12 @@ TIME_ZONE = 'Asia/Kathmandu'
 USE_I18N = True
 USE_TZ = True
 
-# ─── Static files ─────────────────────────────────────────────────────────────
+# ─── Static files (corrected for WhiteNoise) ─────────────────────────────────
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
-
+# Use WhiteNoise's compressed & versioned storage (recommended for production)
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # ─── Media files (served by Cloudinary in production) ────────────────────────
 MEDIA_URL = '/media/'

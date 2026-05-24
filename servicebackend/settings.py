@@ -27,7 +27,6 @@ CSRF_TRUSTED_ORIGINS = [
 
 # ─── Apps ─────────────────────────────────────────────────────────────────────
 INSTALLED_APPS = [
-    'jazzmin',                          # ← must be first
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -126,23 +125,23 @@ cloudinary.config(
 )
 
 # ─── Jazzmin ──────────────────────────────────────────────────────────────────
-JAZZMIN_SETTINGS = {
-    "site_title": "Khoji Admin",
-    "site_header": "Khoji",
-    "site_brand": "Khoji",
-    "welcome_sign": "Welcome to Khoji Admin",
-    "site_icon": None,
-    "show_sidebar": True,
-    "navigation_expanded": True,
-    "icons": {
-        "listings.category": "fas fa-th-large",
-        "listings.listing": "fas fa-map-marker-alt",
-        "reviews.review": "fas fa-star",
-        "accounts.user": "fas fa-users",
-    },
-    "default_icon_parents": "fas fa-chevron-circle-right",
-    "default_icon_children": "fas fa-circle",
-}
+# JAZZMIN_SETTINGS = {
+#     "site_title": "Khoji Admin",
+#     "site_header": "Khoji",
+#     "site_brand": "Khoji",
+#     "welcome_sign": "Welcome to Khoji Admin",
+#     "site_icon": None,
+#     "show_sidebar": True,
+#     "navigation_expanded": True,
+#     "icons": {
+#         "listings.category": "fas fa-th-large",
+#         "listings.listing": "fas fa-map-marker-alt",
+#         "reviews.review": "fas fa-star",
+#         "accounts.user": "fas fa-users",
+#     },
+#     "default_icon_parents": "fas fa-chevron-circle-right",
+#     "default_icon_children": "fas fa-circle",
+# }
 
 # ─── DRF ─────────────────────────────────────────────────────────────────────
 REST_FRAMEWORK = {

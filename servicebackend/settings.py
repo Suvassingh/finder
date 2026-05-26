@@ -1,3 +1,4 @@
+import json
 import os
 from pathlib import Path
 from datetime import timedelta
@@ -28,9 +29,17 @@ if _extra_hosts:
 CSRF_TRUSTED_ORIGINS = [
     'https://khoji-com.onrender.com',
 ]
-FIREBASE_SERVICE_ACCOUNT_KEY = os.path.join(BASE_DIR, 'firebase', 'serviceAccountKey.json')
-cred = credentials.Certificate(FIREBASE_SERVICE_ACCOUNT_KEY)
-firebase_admin.initialize_app(cred)
+firebase_creds_json = os.environ.get('FIREBASE_SERVICE_ACCOUNT_JSON')
+if firebase_creds_json:
+    cred_dict = json.loads(firebase_creds_json)
+    cred = credentials.Certificate(cred_dict)
+    firebase_admin.initialize_app(cred)
+else:
+    # Fallback for local development (keep file loading)
+    cred_path = os.path.join(BASE_DIR, 'firebase', 'serviceAccountKey.json')
+    if os.path.exists(cred_path):
+        cred = credentials.Certificate(cred_path)
+        firebase_admin.initialize_app(cred)
 # ─── Apps ─────────────────────────────────────────────────────────────────────
 INSTALLED_APPS = [
     'django.contrib.admin',

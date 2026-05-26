@@ -1,5 +1,6 @@
 from django.urls import path
 from .views import (
+    follow_category,
     list_categories,
     create_category,
     list_all_listings,
@@ -7,6 +8,8 @@ from .views import (
     get_listing_detail,
     list_featured_listings,
     create_listing,
+    my_followed_categories,
+    unfollow_category,
     update_listing,
     delete_listing,
     my_listings,
@@ -40,4 +43,7 @@ urlpatterns = [
 
     # ── Media upload ─────────────────────────────────────────────────────────
     path('upload/', upload_images, name='upload_images'),
+    path('follow/<int:category_id>/', follow_category, name='follow_category'),
+    path('unfollow/<int:category_id>/', unfollow_category, name='unfollow_category'),
+    path('my-followed-categories/', my_followed_categories, name='my_followed_categories'),
 ]

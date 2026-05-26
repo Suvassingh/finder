@@ -26,3 +26,23 @@ def notify_on_new_listing(sender, instance, created, **kwargs):
                     f"{instance.owner.first_name} posted: {instance.title}",
                     data={'listing_id': instance.id}
                 )
+@receiver(post_save, sender=Listing)
+def notify_category_followers_on_new_listing(sender, instance, created, **kwargs):
+    if not created:
+        return  # Only notify for new listings
+
+    category = instance.category
+    followers = category.followers.select_related('user')
+    
+    for follow in followers:
+        user = follow.user
+        # Don't notify the listing owner (optional)
+        if user == instance.owner:
+            continue
+        
+        send_push_notification(
+            user,
+            f"New {category.name} listing",
+            f"{instance.owner.first_name} posted: {instance.title}",
+            data={'listing_id': instance.id}
+        )

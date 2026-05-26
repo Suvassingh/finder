@@ -417,3 +417,50 @@ def upload_images(request):
 
     status_code = 201 if urls else 400
     return Response(response, status=status_code)
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from .models import Category, CategoryFollow
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def follow_category(request, category_id):
+    try:
+        category = Category.objects.get(id=category_id)
+    except Category.DoesNotExist:
+        return Response({"error": "Category not found"}, status=404)
+
+    follow, created = CategoryFollow.objects.get_or_create(
+        user=request.user,
+        category=category
+    )
+    if created:
+        return Response({"message": f"You are now following {category.name}"}, status=201)
+    else:
+        return Response({"message": f"You already follow {category.name}"}, status=200)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def unfollow_category(request, category_id):
+    try:
+        category = Category.objects.get(id=category_id)
+    except Category.DoesNotExist:
+        return Response({"error": "Category not found"}, status=404)
+
+    deleted, _ = CategoryFollow.objects.filter(user=request.user, category=category).delete()
+    if deleted:
+        return Response({"message": f"You stopped following {category.name}"}, status=200)
+    else:
+        return Response({"message": "You were not following this category"}, status=400)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def my_followed_categories(request):
+    follows = request.user.followed_categories.select_related('category')
+    data = [{
+        'id': f.category.id,
+        'name': f.category.name,
+        'slug': f.category.slug,
+        'followed_at': f.followed_at,
+    } for f in follows]
+    return Response(data)

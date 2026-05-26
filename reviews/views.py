@@ -26,15 +26,6 @@ def create_review(request, listing_id):
         listing = Listing.objects.get(pk=listing_id, status='active')
     except Listing.DoesNotExist:
         return Response({"error": "Listing not found."}, status=404)
-    review = serializers.save(listing=listing, reviewer=request.user)
-    if listing.owner != request.user:
-        send_push_notification(
-            listing.owner,
-            "New review on your listing",
-            f"{request.user.first_name} rated '{listing.title}' {review.rating}★",
-            data={'listing_id': listing.id}
-        )
-    return Response(ReviewSerializer(review, context={'request': request}).data, status=201)
 
     if listing.owner_id == request.user.id:
         return Response({"error": "You cannot review your own listing."}, status=400)
@@ -45,12 +36,18 @@ def create_review(request, listing_id):
     serializer = ReviewCreateSerializer(data=request.data)
     if serializer.is_valid():
         review = serializer.save(listing=listing, reviewer=request.user)
+        # Send push notification to the listing owner
+        send_push_notification(
+            listing.owner,
+            "New review on your listing",
+            f"{request.user.first_name} rated '{listing.title}' {review.rating}★",
+            data={'listing_id': listing.id}
+        )
         return Response(
             ReviewSerializer(review, context={'request': request}).data,
             status=201,
         )
     return Response(serializer.errors, status=400)
-
 
 @api_view(['PATCH', 'DELETE'])
 @permission_classes([IsAuthenticated])

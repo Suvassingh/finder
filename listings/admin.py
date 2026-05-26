@@ -1,4 +1,6 @@
 from django.contrib import admin
+
+from notifications.utils import send_push_notification
 from .models import (
     BusDetail, Category, HotelDetail, Listing,
     RestaurantDetail, RoomDetail, SalonDetail,
@@ -47,6 +49,19 @@ class ListingAdmin(admin.ModelAdmin):
         RoomDetailInline, HotelDetailInline, SalonDetailInline,
         BusDetailInline, RestaurantDetailInline,
     ]
+    def save_model(self, request, obj, form, change):
+        # Check if this is an update and the featured flag changed
+        if change:
+            original = Listing.objects.get(pk=obj.pk)
+            if not original.is_featured and obj.is_featured:
+                # Featured just turned on → notify owner
+                send_push_notification(
+                    obj.owner,
+                    "Your listing is now featured!",
+                    f"'{obj.title}' is now featured and will appear prominently.",
+                    data={'listing_id': obj.id}
+                )
+        super().save_model(request, obj, form, change)
 
 
 @admin.register(Category)

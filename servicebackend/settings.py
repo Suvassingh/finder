@@ -2,6 +2,10 @@ import os
 from pathlib import Path
 from datetime import timedelta
 from dotenv import load_dotenv
+import firebase_admin
+from firebase_admin import credentials
+
+
 
 load_dotenv()
 
@@ -24,7 +28,9 @@ if _extra_hosts:
 CSRF_TRUSTED_ORIGINS = [
     'https://khoji-com.onrender.com',
 ]
-
+FIREBASE_SERVICE_ACCOUNT_KEY = os.path.join(BASE_DIR, 'firebase', 'serviceAccountKey.json')
+cred = credentials.Certificate(FIREBASE_SERVICE_ACCOUNT_KEY)
+firebase_admin.initialize_app(cred)
 # ─── Apps ─────────────────────────────────────────────────────────────────────
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -47,6 +53,7 @@ INSTALLED_APPS = [
     'accounts',
     'listings',
     'reviews',
+    'notifications',
 ]
 
 # ─── Middleware ───────────────────────────────────────────────────────────────
@@ -186,18 +193,15 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 STORAGES = {
-    # "default": {
-    #     "BACKEND": "django.core.files.storage.FileSystemStorage",
-    # },
+ 
     "default": {
-        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",  # ← change this
+        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage", 
     },
     "staticfiles": {
-        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",  # ← plain, no compression
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage", 
     },
 }
 
-# For django-cloudinary-storage compatibility
 STATICFILES_STORAGE = "django.contrib.staticfiles.storage.StaticFilesStorage"
 
 WHITENOISE_MANIFEST_STRICT = False
@@ -205,11 +209,11 @@ WHITENOISE_MANIFEST_STRICT = False
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# ─── File upload limits ───────────────────────────────────────────────────────
-DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024   # 10 MB
-FILE_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024   # 10 MB
+#  File upload limits 
+DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024   
+FILE_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024   
 
-# ─── Email ────────────────────────────────────────────────────────────────────
+#  Email 
 EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
 EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.gmail.com')
 EMAIL_PORT = int(os.getenv('EMAIL_PORT', 587))

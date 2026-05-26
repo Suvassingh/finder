@@ -25,6 +25,9 @@ urlpatterns = [
 
     # Reviews
     path('api/reviews/', include('reviews.urls')),
+    #notification
+    path('api/notifications/',include('notifications.urls'),
+    ),
 ]
 
 if settings.DEBUG:

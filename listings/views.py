@@ -10,6 +10,8 @@ from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from notifications.utils import send_push_notification
+
 from .models import Category, Listing, SavedListing, UploadedImage
 from .serializers import (
     CategorySerializer,
@@ -323,11 +325,18 @@ def toggle_save_listing(request):
         return Response({"error": "Listing not found."}, status=404)
 
     obj, created = SavedListing.objects.get_or_create(user=request.user, listing=listing)
-    if not created:
+    if created:
+        # Notify listing owner
+        send_push_notification(
+            listing.owner,
+            "Someone saved your listing",
+            f"{request.user.first_name} saved '{listing.title}'",
+            data={'listing_id': listing.id}
+        )
+        return Response({"saved": True, "message": "Listing saved."}, status=201)
+    else:
         obj.delete()
         return Response({"saved": False, "message": "Listing removed from saved."})
-
-    return Response({"saved": True, "message": "Listing saved."}, status=201)
 
 
 @api_view(['GET'])
